@@ -1,0 +1,27 @@
+<template>
+	<lightning-card title="Supervisor" icon-name="standard:people">
+		<div class="slds-var-m-around_medium">
+			<!-- Show supervisor when bear is loaded -->
+			<template if:true={bear.data}>
+				<lightning-record-form
+					object-api-name="Contact"
+					record-id={supervisorId}
+					layout-type="Compact">
+				</lightning-record-form>
+			</template>
+			<!-- Data failed to load -->
+			<template if:true={bear.error}>
+				<div class="slds-text-color_error">
+					An error occurred while loading the bear record
+				</div>
+			</template>
+		</div>
+	</lightning-card>
+</template>
+
+<!-- Destaques do código:
+
+Usamos uma diretiva if:true para renderizar condicionalmente o supervisor quando os dados do urso são carregados.
+Mostramos uma exibição compacta do registro de supervisor (Contato) com um lightning-record-form.
+Usamos uma diretiva if:true e a propriedade error para renderizar condicionalmente uma mensagem de erro quando não conseguimos carregar o registro de urso.
+-->
