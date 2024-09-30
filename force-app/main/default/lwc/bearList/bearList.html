@@ -1,11 +1,13 @@
 <template>
 	<lightning-card title="Bears" icon-name="utility:animal_and_nature">
 		<div class="slds-card__body slds-card__body_inner">
-			<!-- Start bear list -->
 			<!-- <template if:true={bears}> -->
+				<!-- Start bear list -->
 				<template if:true={bears.data}>
-					<!-- Isso adiciona um campo de entrada de pesquisa. Quando seu valor muda, chamamos a função handleSearchTermChange.-->
-				<lightning-input type="search"
+					
+					<!-- Isso adiciona um campo de entrada de pesquisa. 
+					Quando seu valor muda, chamamos a função handleSearchTermChange.-->
+					<lightning-input type="search"
 					onchange={handleSearchTermChange}
 					variant="label-hidden"
 					class="slds-var-m-bottom_small"
@@ -13,27 +15,12 @@
 					placeholder="Search for bears"
 					value={searchTerm}>
 				</lightning-input>
+
 				<lightning-layout multiple-rows="true" pull-to-boundary="small">
 					<!-- <template for:each={bears} for:item="bear"> -->
 						<template for:each={bears.data} for:item="bear">
 						<lightning-layout-item key={bear.Id} size="3" class="slds-var-p-around_x-small">
-							<!-- Start bear tile -->
-							<lightning-card title={bear.Name} class="bear-tile">
-								<div class="slds-var-p-horizontal_small bear-tile-body">
-									<div class="slds-media">
-										<div class="slds-media__figure">
-											<img src={appResources.bearSilhouette} alt="Bear profile" class="bear-silhouette"/>
-										</div>
-										<div class="slds-media__body">
-											<p class="slds-var-m-bottom_xx-small">{bear.Sex__c}</p>
-											<p class="slds-var-m-bottom_xx-small">{bear.Age__c} years old</p>
-											<p class="slds-var-m-bottom_xx-small">{bear.Height__c} cm</p>
-											<p class="slds-var-m-bottom_xx-small">{bear.Weight__c} Kg</p>
-										</div>
-									</div>
-								</div>
-							</lightning-card>
-							<!-- End bear tile -->
+							<c-bear-tile bear={bear} onbearview={handleBearView}></c-bear-tile>
 						</lightning-layout-item>
 					</template>
 				</lightning-layout>
@@ -43,7 +30,7 @@
 						This is beary disturbing, we did not find results...
 					</div>
 				</template>
-			</template>
+			</template> 
 			<!-- End bear list -->
 			<!-- Data failed to load -->
 			<!-- <template if:true={error}> -->
@@ -78,4 +65,26 @@
     A marca p é usada para exibir os detalhes do urso, como sexo, idade, altura e peso.
     A marca template com a diretiva if:true é usada para exibir uma mensagem de erro se os dados falharem ao carregar.
     A marca div é usada para exibir a mensagem de erro.
+
+	Start bear tile 
+	<lightning-card title={bear.Name} class="bear-tile">
+								<div class="slds-var-p-horizontal_small bear-tile-body">
+									<div class="slds-media">
+										<div class="slds-media__figure">
+											<img src={appResources.bearSilhouette} alt="Bear profile" class="bear-silhouette"/>
+										</div>
+										<div class="slds-media__body">
+											<p class="slds-var-m-bottom_xx-small">{bear.Sex__c}</p>
+											<p class="slds-var-m-bottom_xx-small">{bear.Age__c} years old</p>
+											<p class="slds-var-m-bottom_xx-small">{bear.Height__c} cm</p>
+											<p class="slds-var-m-bottom_xx-small">{bear.Weight__c} Kg</p>
+										</div>
+									</div>
+								</div>
+	</lightning-card>
+	End bear tile 
+
+	This references our bear tile component with the bear attribute that we defined in the previous steps. Notice that our component folder and files are named bearTile, but the tag we added is c-bear-tile. The starting c represents the default namespace, appended with the name of the component in lowercase, with dashes separating what use to be capital letters. This is the convention for referencing custom components in Lightning web components.
+
+	um atributo onbearview={handleBearView} à marca c-bear-tile. Isso nos permite capturar o evento bearview que é acionado pelo componente de bloco. O evento é processado em uma função handleBearView. 
 -->

@@ -1,6 +1,51 @@
+import { NavigationMixin } from 'lightning/navigation';
+import { LightningElement, wire } from 'lwc';
+/** BearController.searchBears(searchTerm) Apex method */
+import searchBears from '@salesforce/apex/BearController.searchBears';
+
+export default class BearList extends NavigationMixin(LightningElement) {
+	searchTerm = '';
+
+	@wire(searchBears, {searchTerm: '$searchTerm'})
+
+	bears;
+
+	handleSearchTermChange(event) {
+		// Debouncing this method: do not update the reactive property as
+		// long as this function is being called within a delay of 300 ms.
+		// This is to avoid a very large number of Apex method calls.
+		window.clearTimeout(this.delayTimeout);
+		const searchTerm = event.target.value;
+		// eslint-disable-next-line @lwc/lwc/no-async-operation
+		this.delayTimeout = setTimeout(() => {
+			this.searchTerm = searchTerm;
+		}, 300);
+	}
+
+	get hasResults() {
+		return (this.bears.data.length > 0);
+	}
+	
+	handleBearView(event) {
+		// Get bear record id from bearview event
+		const bearId = event.detail;
+		// Navigate to bear record page
+		this[NavigationMixin.Navigate]({
+			type: 'standard__recordPage',
+			attributes: {
+				recordId: bearId,
+				objectApiName: 'Bear__c',
+				actionName: 'view',
+			},
+		});
+	}
+}
+
+/* 
+
 import { LightningElement, wire } from 'lwc';
 import ursusResources from '@salesforce/resourceUrl/ursus_park';
-/** BearController.searchBears(searchTerm) Apex method */
+/** BearController.searchBears(searchTerm) Apex method 
 import searchBears from '@salesforce/apex/BearController.searchBears';
 export default class BearList extends LightningElement {
 	searchTerm = '';
@@ -24,6 +69,8 @@ export default class BearList extends LightningElement {
 		return (this.bears.data.length > 0);
 	}
 }
+
+*/
 
 /* 
 Destaques do código:
@@ -86,7 +133,7 @@ export default class BearList extends LightningElement {
 } */
 
 /* 
-Destaques do código:
+	Destaques do código:
 
     Importamos o adaptador ursusResources, que nos dá acesso a um recurso estático associado ao nosso aplicativo. 
     Usamos esse adaptador para criar um objeto appResources que expõe a URL de imagem de silhueta do urso no modelo.
@@ -98,4 +145,15 @@ Destaques do código:
     A função loadBears chama o adaptador getAllBears. O adaptador chama nosso código do Apex e retorna uma promessa de JS. 
     Usamos a promessa para salvar os dados retornados na propriedade bears ou para relatar erros. 
     A recuperação de dados com essa abordagem é chamada de Apex imperativo.
+
+	Destaques do código:
+
+    Importamos um mixin de navegação que reúne funções de utilitários que lidam com navegação. Um mixin permite adicionar funcionalidades a uma classe sem estendê-la. Isso é útil quando uma classe já estende uma classe pai (uma classe só pode estender um único pai).
+    Nossa classe estende o mixin de navegação aplicado à classe base LightningElement.
+    Processamos o evento bearview na função handleBearView. Extraímos a ID de registro de urso dos detalhes do evento e usamos o mixin de navegação para navegar até uma página de registro de urso.
+    Implante o código atualizado na organização e teste se você consegue navegar até um registro de urso com o ícone de botão em um bloco.
+
+	Refatoramos nosso componente em dois componentes menores: a lista de ursos e um bloco de urso. 
+	Exploramos como comunicar do componente de lista pai para o componente de bloco filho com um decorador @api. 
+	Também vimos como comunicar de um filho com um pai usando um evento personalizado.
 */
