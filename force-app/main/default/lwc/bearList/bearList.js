@@ -1,3 +1,5 @@
+import { publish, MessageContext } from 'lightning/messageService';
+import BEAR_LIST_UPDATE_MESSAGE from '@salesforce/messageChannel/BearListUpdate__c';
 import { NavigationMixin } from 'lightning/navigation';
 import { LightningElement, wire } from 'lwc';
 /** BearController.searchBears(searchTerm) Apex method */
@@ -6,9 +8,21 @@ import searchBears from '@salesforce/apex/BearController.searchBears';
 export default class BearList extends NavigationMixin(LightningElement) {
 	searchTerm = '';
 
-	@wire(searchBears, {searchTerm: '$searchTerm'})
+	// @wire(searchBears, {searchTerm: '$searchTerm'})
+	// bears;
 
 	bears;
+	@wire(MessageContext) messageContext;
+	@wire(searchBears, {searchTerm: '$searchTerm'})
+	loadBears(result) {
+	this.bears = result;
+	if (result.data) {
+		const message = {
+		bears: result.data
+		};
+		publish(this.messageContext, BEAR_LIST_UPDATE_MESSAGE, message);
+	}
+	}
 
 	handleSearchTermChange(event) {
 		// Debouncing this method: do not update the reactive property as
@@ -156,4 +170,12 @@ export default class BearList extends LightningElement {
 	Refatoramos nosso componente em dois componentes menores: a lista de ursos e um bloco de urso. 
 	Exploramos como comunicar do componente de lista pai para o componente de bloco filho com um decorador @api. 
 	Também vimos como comunicar de um filho com um pai usando um evento personalizado.
+
+	Destaques do código:
+
+    Recuperamos o contexto da mensagem do Lightning e o armazenamos em uma propriedade messageContext.
+    Usamos uma função conectada para capturar dados da lista de ursos recebidos e acionar uma mensagem do Lightning BearListUpdate__c personalizada com a lista de registros de urso.
+    Transmitimos searchTerm como um parâmetro dinâmico a nosso adaptador searchBears conectado para que cada vez que searchTerm muda, loadBears seja executado novamente e uma nova mensagem seja acionada com os novos resultados da pesquisa.
+    Usamos a função publish que importamos do LMS para acionar uma mensagem do Lightning BearListUpdate__c com a lista de ursos.
+	Adicionamos um evento bearview que é acionado quando um bloco de urso é clicado.
 */
